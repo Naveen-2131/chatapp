@@ -11,7 +11,7 @@ import CreateGroupModal from '../components/CreateGroupModal';
 import ProfileModal from '../components/ProfileModal';
 import GroupInfoModal from '../components/GroupInfoModal';
 import { formatLastSeen, isUserOnline } from '../utils/timeUtils';
-
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
 const ChatDashboard = () => {
     const { user, logout } = useAuth();
     const { socket } = useSocket();
@@ -294,113 +294,113 @@ const ChatDashboard = () => {
         toast.success('Group created successfully!');
     };
 
-    const renderFilePreview = (msg) => {
-        if (!msg.fileUrl) return null;
+const renderFilePreview = (msg) => {
+    if (!msg.fileUrl) return null;
 
-        if (msg.fileType === 'image') {
-            return (
-                <div className="mt-2">
-                    <img
-                        src={`http://localhost:5000${msg.fileUrl}`}
-                        alt={msg.fileName}
-                        className="max-w-xs rounded-lg cursor-pointer hover:opacity-90"
-                        onClick={() => window.open(`http://localhost:5000${msg.fileUrl}`, '_blank')}
-                    />
-                </div>
-            );
-        } else if (msg.fileType === 'video') {
-            return (
-                <div className="mt-2">
-                    <video
-                        src={`http://localhost:5000${msg.fileUrl}`}
-                        controls
-                        className="max-w-xs rounded-lg"
-                    />
-                </div>
-            );
-        } else {
-            return (
-                <a
-                    href={`http://localhost:5000${msg.fileUrl}`}
-                    download={msg.fileName}
-                    className="flex items-center space-x-2 mt-2 p-2 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600"
-                >
-                    <FiFile className="w-5 h-5" />
-                    <span className="text-sm">{msg.fileName}</span>
-                    <FiDownload className="w-4 h-4 ml-auto" />
-                </a>
-            );
-        }
-    };
+    if (msg.fileType === 'image') {
+        return (
+            <div className="mt-2">
+                <img
+                    src={`${API_BASE}${msg.fileUrl}`}
+                    alt={msg.fileName}
+                    className="max-w-xs rounded-lg cursor-pointer hover:opacity-90"
+                    onClick={() => window.open(`${API_BASE}${msg.fileUrl}`, '_blank')}
+                />
+            </div>
+        );
+    } else if (msg.fileType === 'video') {
+        return (
+            <div className="mt-2">
+                <video
+                    src={`${API_BASE}${msg.fileUrl}`}
+                    controls
+                    className="max-w-xs rounded-lg"
+                />
+            </div>
+        );
+    } else {
+        return (
+            <a
+                href={`${API_BASE}${msg.fileUrl}`}
+                download={msg.fileName}
+                className="flex items-center space-x-2 mt-2 p-2 bg-slate-100 dark:bg-slate-700 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600"
+            >
+                <FiFile className="w-5 h-5" />
+                <span className="text-sm">{msg.fileName}</span>
+                <FiDownload className="w-4 h-4 ml-auto" />
+            </a>
+        );
+    }
+};
 
-    return (
-        <div className="flex h-screen bg-slate-900/50 backdrop-blur-sm overflow-hidden transition-colors duration-300">
-            {/* Sidebar */}
-            <div className="w-1/4 bg-slate-800/80 backdrop-blur-md border-r border-slate-700/50 flex flex-col shadow-xl z-10">
-                {/* Header */}
-                <div className="p-4 border-b border-slate-700/50">
-                    <div className="flex justify-between items-center mb-6">
-                        <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => setShowProfileModal(true)}>
-                            <div className="relative">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-secondary p-[2px]">
-                                    <div className="w-full h-full rounded-full bg-slate-800 overflow-hidden">
-                                        {user?.profilePicture ? (
-                                            <img src={`http://localhost:5000${user.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-slate-700 text-primary font-bold text-xl">
-                                                {user?.username?.[0].toUpperCase()}
-                                            </div>
-                                        )}
-                                    </div>
+return (
+    <div className="flex h-screen bg-slate-900/50 backdrop-blur-sm overflow-hidden transition-colors duration-300">
+        {/* Sidebar */}
+        <div className="w-1/4 bg-slate-800/80 backdrop-blur-md border-r border-slate-700/50 flex flex-col shadow-xl z-10">
+            {/* Header */}
+            <div className="p-4 border-b border-slate-700/50">
+                <div className="flex justify-between items-center mb-6">
+                    <div className="flex items-center space-x-3 group cursor-pointer" onClick={() => setShowProfileModal(true)}>
+                        <div className="relative">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-secondary p-[2px]">
+                                <div className="w-full h-full rounded-full bg-slate-800 overflow-hidden">
+                                    {user?.profilePicture ? (
+                                        <img src={`${API_BASE}${user.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-slate-700 text-primary font-bold text-xl">
+                                            {user?.username?.[0].toUpperCase()}
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800"></div>
                             </div>
-                            <div>
-                                <h2 className="font-bold text-white text-lg group-hover:text-primary transition-colors">{user?.username}</h2>
-                                <p className="text-xs text-slate-400">Online</p>
-                            </div>
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800"></div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                            {user?.role === 'admin' && (
-                                <button
-                                    onClick={() => navigate('/admin')}
-                                    className="p-2 rounded-full hover:bg-slate-700 text-slate-300 transition-all duration-200"
-                                    title="Admin Dashboard"
-                                >
-                                    <FiShield className="w-5 h-5" />
-                                </button>
-                            )}
+                        <div>
+                            <h2 className="font-bold text-white text-lg group-hover:text-primary transition-colors">{user?.username}</h2>
+                            <p className="text-xs text-slate-400">Online</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        {user?.role === 'admin' && (
                             <button
-                                onClick={logout}
-                                className="p-2 rounded-full hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-all duration-200"
-                                title="Logout"
+                                onClick={() => navigate('/admin')}
+                                className="p-2 rounded-full hover:bg-slate-700 text-slate-300 transition-all duration-200"
+                                title="Admin Dashboard"
                             >
-                                <FiLogOut className="w-5 h-5" />
+                                <FiShield className="w-5 h-5" />
                             </button>
-                        </div>
+                        )}
+                        <button
+                            onClick={logout}
+                            className="p-2 rounded-full hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-all duration-200"
+                            title="Logout"
+                        >
+                            <FiLogOut className="w-5 h-5" />
+                        </button>
                     </div>
+                </div>
 
-                    {/* Tabs */}
-                    <div className="flex p-1 bg-slate-700/50 rounded-xl mb-4">
-                        <button
-                            onClick={() => setActiveTab('chats')}
-                            className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'chats'
-                                ? 'bg-slate-600 text-primary shadow-sm'
-                                : 'text-slate-400 hover:text-slate-200'
-                                }`}
-                        >
-                            Chats
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('groups')}
-                            className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'groups'
-                                ? 'bg-slate-600 text-primary shadow-sm'
-                                : 'text-slate-400 hover:text-slate-200'
-                                }`}
-                        >
-                            Groups
-                        </button>
-                    </div>
+                {/* Tabs */}
+                <div className="flex p-1 bg-slate-700/50 rounded-xl mb-4">
+                    <button
+                        onClick={() => setActiveTab('chats')}
+                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'chats'
+                            ? 'bg-slate-600 text-primary shadow-sm'
+                            : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                    >
+                        Chats
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('groups')}
+                        className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === 'groups'
+                            ? 'bg-slate-600 text-primary shadow-sm'
+                            : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                    >
+                        Groups
+                    </button>
+                </div>
 
                     {/* Search */}
                     <div className="relative">
@@ -442,7 +442,7 @@ const ChatDashboard = () => {
                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary to-accent p-[2px]">
                                         <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
                                             {result.profilePicture ? (
-                                                <img src={`http://localhost:5000${result.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
+                                                <img src={`{API_BASE}${result.profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
                                             ) : (
                                                 <span className="text-secondary font-bold">{result.username[0].toUpperCase()}</span>
                                             )}
@@ -479,7 +479,7 @@ const ChatDashboard = () => {
                                                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 p-[2px]">
                                                     <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
                                                         {chat.participants.find(p => p._id !== user._id)?.profilePicture ? (
-                                                            <img src={`http://localhost:5000${chat.participants.find(p => p._id !== user._id).profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
+                                                            <img src={`{API_BASE}${chat.participants.find(p => p._id !== user._id).profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <span className="text-indigo-500 font-bold text-lg">
                                                                 {chat.participants.find(p => p._id !== user._id)?.username[0].toUpperCase()}
@@ -588,7 +588,7 @@ const ChatDashboard = () => {
                                             <FiUsers className="w-5 h-5 text-primary" />
                                         ) : (
                                             selectedChat.participants.find(p => p._id !== user._id)?.profilePicture ? (
-                                                <img src={`http://localhost:5000${selectedChat.participants.find(p => p._id !== user._id).profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
+                                                <img src={`{API_BASE}${selectedChat.participants.find(p => p._id !== user._id).profilePicture}`} alt="Profile" className="w-full h-full object-cover" />
                                             ) : (
                                                 <span className="text-primary font-bold">{selectedChat.participants.find(p => p._id !== user._id)?.username[0].toUpperCase()}</span>
                                             )
@@ -693,7 +693,7 @@ const ChatDashboard = () => {
                                                 <div className={`w-8 h-8 rounded-full mr-2 flex-shrink-0 bg-gradient-to-br from-secondary to-accent p-[1px] ${showAvatar ? 'opacity-100' : 'opacity-0'}`}>
                                                     <div className="w-full h-full rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
                                                         {msg.sender.profilePicture ? (
-                                                            <img src={`http://localhost:5000${msg.sender.profilePicture}`} alt="Avatar" className="w-full h-full object-cover" />
+                                                            <img src={`{API_BASE}${msg.sender.profilePicture}`} alt="Avatar" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <span className="text-[10px] font-bold text-secondary">{msg.sender.username[0].toUpperCase()}</span>
                                                         )}
