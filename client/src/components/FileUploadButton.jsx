@@ -1,6 +1,6 @@
 import { useState, forwardRef, useImperativeHandle, useEffect, useRef } from 'react';
 import { FiPaperclip, FiX, FiFile, FiImage, FiVideo } from 'react-icons/fi';
-
+ 
 const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
     const [preview, setPreview] = useState(null);
     const inputRef = useRef(null);
@@ -22,7 +22,12 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
     }, [file]);
 
     useImperativeHandle(ref, () => ({
-        reset: () => { if (inputRef.current) inputRef.current.value = ''; }
+        reset: () => {
+            if (inputRef.current) {
+                inputRef.current.value = '';
+                setPreview(null);
+            }
+        }
     }));
 
     const handleFileChange = (e) => {
@@ -31,11 +36,14 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
 
         if (selectedFile.size > 50 * 1024 * 1024) {
             alert('File size must be less than 50MB');
+            if (inputRef.current) inputRef.current.value = '';  // ✅ fix
             return;
         }
 
         const allowedTypes = [
-            'image/jpeg', 'image/png', 'image/gif',
+            'image/jpeg',
+            'image/png',
+            'image/gif',
             'video/mp4',
             'application/pdf',
             'application/msword',
@@ -43,7 +51,8 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
         ];
 
         if (!allowedTypes.includes(selectedFile.type)) {
-            alert('Invalid file type. Allowed: images, videos, PDF, Word docs');
+            alert('Invalid file type. Allowed: images, videos, PDF, Word docs')
+            if (inputRef.current) inputRef.current.value = ''; // ✅ fix
             return;
         }
 
@@ -53,6 +62,12 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
     const clearFile = (e) => {
         e.preventDefault();
         onFileSelect(null);
+
+        if (inputRef.current) {
+            inputRef.current.value = ''; // ✅ fix
+        }
+
+        setPreview(null); // ✅ fix
     };
 
     const getFileIcon = () => {
@@ -76,17 +91,31 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
             {file ? (
                 <div className="flex items-center space-x-2 px-3 py-2 bg-slate-700 rounded-lg">
                     {preview ? (
-                        <img src={preview} alt="Preview" className="w-12 h-12 object-cover rounded" />
+                        <img
+                            src={preview}
+                            alt="Preview"
+                            className="w-12 h-12 object-cover rounded"
+                        />
                     ) : (
                         <div className="w-12 h-12 bg-slate-600 rounded flex items-center justify-center">
                             {getFileIcon()}
                         </div>
                     )}
+
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{file.name}</p>
-                        <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        <p className="text-sm font-medium text-white truncate">
+                            {file.name}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
                     </div>
-                    <button type="button" onClick={clearFile} className="p-1 hover:bg-slate-600 rounded">
+
+                    <button
+                        type="button"
+                        onClick={clearFile}
+                        className="p-1 hover:bg-slate-600 rounded"
+                    >
                         <FiX className="w-4 h-4 text-slate-300" />
                     </button>
                 </div>
