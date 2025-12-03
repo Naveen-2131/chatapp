@@ -10,40 +10,40 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
         if (file) {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onloadend = () => {
-                    setPreview(reader.result);
-                };
+                reader.onloadend = () => setPreview(reader.result);
                 reader.readAsDataURL(file);
             } else {
                 setPreview(null);
             }
         } else {
             setPreview(null);
-            if (inputRef.current) {
-                inputRef.current.value = '';
-            }
+            if (inputRef.current) inputRef.current.value = '';
         }
     }, [file]);
+
     useImperativeHandle(ref, () => ({
-        reset: () => {
-            if (inputRef.current) {
-                inputRef.current.value = '';
-            }
-        }
+        reset: () => { if (inputRef.current) inputRef.current.value = ''; }
     }));
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
-
         if (!selectedFile) return;
+
         if (selectedFile.size > 50 * 1024 * 1024) {
             alert('File size must be less than 50MB');
             return;
         }
 
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        const allowedTypes = [
+            'image/jpeg', 'image/png', 'image/gif',
+            'video/mp4',
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+
         if (!allowedTypes.includes(selectedFile.type)) {
-            alert('Invalid file type. Allowed: images, videos, PDF, Word documents');
+            alert('Invalid file type. Allowed: images, videos, PDF, Word docs');
             return;
         }
 
@@ -51,13 +51,12 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
     };
 
     const clearFile = (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         onFileSelect(null);
     };
 
     const getFileIcon = () => {
         if (!file) return <FiPaperclip className="w-5 h-5" />;
-
         if (file.type.startsWith('image/')) return <FiImage className="w-5 h-5" />;
         if (file.type.startsWith('video/')) return <FiVideo className="w-5 h-5" />;
         return <FiFile className="w-5 h-5" />;
@@ -84,18 +83,10 @@ const FileUploadButton = forwardRef(({ onFileSelect, file }, ref) => {
                         </div>
                     )}
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
-                            {file.name}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                            {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
+                        <p className="text-sm font-medium text-white truncate">{file.name}</p>
+                        <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                     </div>
-                    <button
-                        type="button" 
-                        onClick={clearFile}
-                        className="p-1 hover:bg-slate-600 rounded"
-                    >
+                    <button type="button" onClick={clearFile} className="p-1 hover:bg-slate-600 rounded">
                         <FiX className="w-4 h-4 text-slate-300" />
                     </button>
                 </div>
