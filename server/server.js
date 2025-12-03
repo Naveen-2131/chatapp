@@ -13,6 +13,9 @@ dotenv.config()
 const app = express()
 const server = http.createServer(app)
 
+// ✅ Set dynamic backend URL for uploads
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000'
+
 // ✅ SINGLE CORS (FIXED)
 app.use(cors({
   origin: [
@@ -78,6 +81,13 @@ app.use('/api/admin', require('./routes/adminRoutes'))
 // Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
+// ✅ Optional endpoint to return full upload URLs
+// Example: frontend can fetch uploaded files safely
+app.get('/api/uploads/:filename', (req, res) => {
+  const { filename } = req.params
+  res.json({ url: `${BACKEND_URL}/uploads/${filename}` })
+})
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack)
@@ -89,4 +99,3 @@ const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`)
 })
-  
