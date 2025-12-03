@@ -1,71 +1,60 @@
 import axios from 'axios';
 
+// Determine base URL
+// 1. Use VITE_API_URL if set (for production)
+// 2. Fallback to localhost for local dev
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Main axios instance
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Add a request interceptor to attach the token
-api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
-
-// Create a separate instance for uploads to avoid Content-Type conflicts
+// Upload axios instance (for FormData)
 const uploadApi = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: BASE_URL,
 });
 
-uploadApi.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+// Attach token automatically to requests
+const attachToken = (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+};
 
+api.interceptors.request.use(attachToken, (error) => Promise.reject(error));
+uploadApi.interceptors.request.use(attachToken, (error) => Promise.reject(error));
+
+// Auth service
 export const authService = {
     login: (credentials) => api.post('/auth/login', credentials),
     register: (userData) => api.post('/auth/register', userData),
     logout: () => api.post('/auth/logout'),
-    getMe: () => api.get('/auth/me'),
+    getMe: () => api.get('/auth/me'), // ✅ will now work in production
 };
 
+// User service
 export const userService = {
     searchUsers: (query) => api.get(`/users/search?search=${query}`),
-    updateProfile: (data) => {
-        if (data instanceof FormData) {
-            return uploadApi.put('/users/profile', data);
-        }
-        return api.put('/users/profile', data);
-    },
+    updateProfile: (data) => (data instanceof FormData ? uploadApi.put('/users/profile', data) : api.put('/users/profile', data)),
     updateStatus: (status) => api.put('/users/status', { status }),
 };
 
+// Chat service
 export const chatService = {
     fetchConversations: () => api.get('/conversations'),
     accessConversation: (userId) => api.post('/conversations', { userId }),
     fetchMessages: (conversationId) => api.get(`/messages/conversation/${conversationId}`),
     fetchGroupMessages: (groupId) => api.get(`/messages/group/${groupId}`),
-    sendMessage: (data) => {
-        if (data instanceof FormData) {
-            return uploadApi.post('/messages', data);
-        }
-        return api.post('/messages', data);
-    },
+    sendMessage: (data) => (data instanceof FormData ? uploadApi.post('/messages', data) : api.post('/messages', data)),
 };
 
+// Group service
 export const groupService = {
     createGroup: (data) => api.post('/groups', data),
     fetchGroups: () => api.get('/groups'),
@@ -74,6 +63,7 @@ export const groupService = {
     renameGroup: (groupId, name) => api.put(`/groups/${groupId}`, { name }),
 };
 
+// Notification service
 export const notificationService = {
     getNotifications: () => api.get('/notifications'),
     markAsRead: (id) => api.put(`/notifications/${id}/read`),
@@ -81,4 +71,3 @@ export const notificationService = {
 };
 
 export default api;
-
