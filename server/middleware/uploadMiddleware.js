@@ -1,3 +1,4 @@
+// middleware/upload.js
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -12,8 +13,10 @@ if (!fs.existsSync(uploadDir)) {
 
 // Multer storage engine
 const storage = multer.diskStorage({
-    destination: uploadDir,
-    filename: (req, file, cb) => {
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
         const ext = path.extname(file.originalname);
         const name = file.fieldname + '-' + Date.now() + ext;
         cb(null, name);
@@ -50,14 +53,14 @@ const uploadMiddleware = (req, res, next) => {
         if (err instanceof multer.MulterError) return res.status(400).json({ message: err.message });
         if (err) return res.status(400).json({ message: typeof err === 'string' ? err : err.message });
 
-        // Attach first file to req.file for backward compatibility
+        // Attach first file to req.file
         if (req.files && req.files.length > 0) {
             req.file = req.files[0];
             req.file.url = `${BACKEND_URL}/uploads/${req.file.filename}`;
         }
+
         next();
     });
 };
 
 module.exports = uploadMiddleware;
-
