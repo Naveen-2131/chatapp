@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express') 
 const http = require('http')
 const { Server } = require('socket.io')
 const mongoose = require('mongoose')
@@ -13,13 +13,21 @@ dotenv.config()
 const app = express()
 const server = http.createServer(app)
 
-// ✅ SINGLE CORS (no duplicate)
+// ✅ SINGLE CORS (FIXED)
 app.use(cors({
   origin: [
     "http://localhost:5173",
     "http://localhost:5174",
-    "http://localhost:3000",
-    "https://chatapp1-3pc3zuak0-naveens-projects-fd8f3bd9.vercel.app/"
+    "https://chatapp-client-bice.vercel.app",
+    "https://realtimechatapp8870.netlify.app",
+
+    // ✅ YOUR VERCEL DOMAINS
+    "https://chatapp1-lime.vercel.app",
+    "https://chatapp1-git-main-naveens-projects-fd8f3bd9.vercel.app",
+    "https://chatapp1-44v9tjmmd-naveens-projects-fd8f3bd9.vercel.app",
+
+    // ✅ NEW DOMAIN ADDED
+    "https://chatapp-chi-nine.vercel.app"
   ],
   credentials: true
 }))
@@ -28,14 +36,22 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
-// ✅ CREATE SOCKET.IO INSTANCE
+// ✅ CREATE SOCKET.IO INSTANCE (FIXED)
 const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "http://localhost:3000",
-      "https://realtimechatapp8870.netlify.app"
+      "https://chatapp-client-bice.vercel.app",
+      "https://realtimechatapp8870.netlify.app",
+
+      // ✅ YOUR VERCEL DOMAINS
+      "https://chatapp1-lime.vercel.app",
+      "https://chatapp1-git-main-naveens-projects-fd8f3bd9.vercel.app",
+      "https://chatapp1-44v9tjmmd-naveens-projects-fd8f3bd9.vercel.app",
+
+      // ✅ NEW DOMAIN ADDED
+      "https://chatapp-chi-nine.vercel.app"
     ],
     methods: ["GET", "POST"],
     credentials: true
@@ -73,4 +89,4 @@ const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`)
 })
-
+  
