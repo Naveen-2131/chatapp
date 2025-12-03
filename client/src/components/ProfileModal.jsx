@@ -6,12 +6,16 @@ import { toast } from 'react-hot-toast';
 
 const ProfileModal = ({ isOpen, onClose }) => {
     const { user, setUser } = useAuth();
+
+    const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace('/api', '');
+
     const [formData, setFormData] = useState({
         username: user?.username || '',
         email: user?.email || '',
         customStatus: user?.customStatus || '',
         bio: user?.bio || ''
     });
+
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -70,6 +74,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md">
+
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-slate-700">
                     <h2 className="text-xl font-bold text-white">Edit Profile</h2>
@@ -83,24 +88,37 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
                     {/* Avatar Upload */}
                     <div className="flex flex-col items-center">
                         <div className="relative">
                             <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
+
                                 {avatarPreview ? (
-                                    <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                                    <img
+                                        src={avatarPreview}
+                                        alt="Avatar"
+                                        className="w-full h-full object-cover"
+                                    />
                                 ) : user?.profilePicture ? (
-                                    <img src={`http://localhost:5000${user.profilePicture}`} alt="Avatar" className="w-full h-full object-cover" />
+                                    <img
+                                        src={`${API_BASE}${user.profilePicture}`}
+                                        alt="Avatar"
+                                        className="w-full h-full object-cover"
+                                    />
                                 ) : (
-                                    user?.username[0].toUpperCase()
+                                    user?.username?.[0]?.toUpperCase()
                                 )}
+
                             </div>
+
                             <label
                                 htmlFor="avatar-upload"
                                 className="absolute bottom-0 right-0 p-2 bg-primary hover:bg-indigo-600 text-white rounded-full cursor-pointer shadow-lg transition-colors"
                             >
                                 <FiCamera className="w-4 h-4" />
                             </label>
+
                             <input
                                 type="file"
                                 id="avatar-upload"
@@ -109,7 +127,10 @@ const ProfileModal = ({ isOpen, onClose }) => {
                                 onChange={handleAvatarChange}
                             />
                         </div>
-                        <p className="text-xs text-slate-500 mt-2">Click camera to upload avatar (max 5MB)</p>
+
+                        <p className="text-xs text-slate-500 mt-2">
+                            Click camera to upload avatar (max 5MB)
+                        </p>
                     </div>
 
                     {/* Username */}
@@ -179,6 +200,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                         >
                             Cancel
                         </button>
+
                         <button
                             type="submit"
                             disabled={loading}
@@ -187,6 +209,7 @@ const ProfileModal = ({ isOpen, onClose }) => {
                             {loading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
+
                 </form>
             </div>
         </div>
