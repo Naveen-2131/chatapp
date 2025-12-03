@@ -19,7 +19,7 @@ app.use(cors({
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:3000",
-    "https://realtimechatapp8870.netlify.app"
+    "https://chatapp1-3pc3zuak0-naveens-projects-fd8f3bd9.vercel.app/"
   ],
   credentials: true
 }))
@@ -73,3 +73,4 @@ const PORT = process.env.PORT || 5000
 server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`)
 })
+
